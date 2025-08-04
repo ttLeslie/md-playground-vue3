@@ -47,7 +47,7 @@ export class StreamFetchClient<T = unknown> {
     };
     this.overErrorTimer = config.overErrorTimer || 60 * 1000;
     this.currentEventHandlers = eventHandles || {
-      onMessage: () => {},
+      onMessage: () => { },
     };
     this.abortController = null;
     this.streamTimer = null;
@@ -67,6 +67,7 @@ export class StreamFetchClient<T = unknown> {
   }
 
   public async sendStreamRequest(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     payload: Record<string, any>,
     eventHandlers?: ICurrentEventHandlers<T> | null,
     config?: IStreamFetchClientConfig
@@ -83,6 +84,7 @@ export class StreamFetchClient<T = unknown> {
     try {
       this.startTimer();
       await this.executeFetchRequest(payload);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       this.handleRequestError(error);
     } finally {
@@ -99,6 +101,7 @@ export class StreamFetchClient<T = unknown> {
     this.cacheManager?.destroy();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async executeFetchRequest(payload: Record<string, any>) {
     await fetchEventSource(this.baseUrl, {
       method: "POST",
@@ -118,6 +121,7 @@ export class StreamFetchClient<T = unknown> {
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private handleServerMessage(event: any) {
     this.resetTimer();
     try {
@@ -128,11 +132,13 @@ export class StreamFetchClient<T = unknown> {
       }
       this.currentEventHandlers.onMessage?.(message);
       this.currentMessage = message; // 存储最新的消息
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       this.currentEventHandlers.onParseError?.(this.currentMessage as T, error);
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private buildRequestPayload(payload: Record<string, any>) {
     return {
       ...payload,
@@ -177,6 +183,7 @@ export class StreamFetchClient<T = unknown> {
     this.clearTimer();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private handleRequestError(error: any) {
     this.currentEventHandlers.onServerError?.(this.currentMessage as T, error);
     this.clearTimer();

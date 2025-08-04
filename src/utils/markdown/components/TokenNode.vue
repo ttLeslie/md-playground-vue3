@@ -9,13 +9,13 @@
   </component>
 </template>
 
-<script setup>
-import { computed } from "vue";
-import { defineProps } from "vue";
+<script lang="ts" setup>
+import { computed, watch } from 'vue';
+import { defineProps } from 'vue';
 // 导入具体类型组件
 // import Paragraph from "./nodes/Paragraph.vue";
 // import Heading from "./nodes/Heading.vue";
-import CodeBlock from "./nodes/CodeBlock.vue";
+import CodeBlock from './nodes/CodeBlock.vue';
 // import Link from "./nodes/Link.vue";
 // import Image from "./nodes/Image.vue";
 // import List from "./nodes/List.vue";
@@ -31,29 +31,29 @@ const props = defineProps({
 
 // 映射 Token 类型到组件
 const renderComponent = computed(() => {
-  const { type } = props.node;
+  const { CompontentType } = props.node;
 
-  // 块级元素
-  if (type.startsWith("heading_")) return Heading;
-  if (type === "paragraph_open") return Paragraph;
-  if (type === "fence") return CodeBlock;
-  if (type.startsWith("list_")) return List;
-  if (type.startsWith("list_item_")) return ListItem;
+  // // 块级元素
+  // if (CompontentType.startsWith('heading_')) return Heading;
+  // if (CompontentType === 'paragraph_open') return Paragraph;
+  // if (CompontentType === 'fence') return CodeBlock;
+  // if (CompontentType.startsWith('list_')) return List;
+  // if (CompontentType.startsWith('list_item_')) return ListItem;
 
-  // 行内元素
-  if (type === "link_open") return Link;
-  if (type === "image") return Image;
-  if (type === "text") return Text;
+  // // 行内元素
+  // if (CompontentType === 'link_open') return Link;
+  // if (CompontentType === 'image') return Image;
+  // if (CompontentType === 'text') return Text;
 
   // 默认使用通用容器
-  return "div";
+  return 'div';
 });
 
 // 提取组件需要的属性
 const componentProps = computed(() => {
-  const { attrs, content, markup, type } = props.node;
+  const { attrs, content, markup, CompontentType } = props.node;
   // 将 attrs 数组转换为对象 { name: value }
-  const attrsObj = (attrs || []).reduce((obj, [key, value]) => {
+  const attrsObj = (attrs || []).reduce((obj: any, [key, value]: any) => {
     obj[key] = value;
     return obj;
   }, {});
@@ -62,7 +62,16 @@ const componentProps = computed(() => {
     ...attrsObj,
     content,
     markup,
-    type,
+    CompontentType,
   };
 });
+
+watch(
+  () => props.node,
+  (newNode) => {
+    // 当节点变化时，可以在这里添加额外的逻辑
+    console.log('Node changed:', newNode);
+  },
+  { deep: true, immediate: true },
+);
 </script>

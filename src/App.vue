@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import { StreamFetchClient } from "./utils/stream/StreamFetchClient";
-import { getCompontentTree } from "./utils/markdown/utils";
+import { onMounted, ref } from 'vue';
+import { StreamFetchClient } from './utils/stream/StreamFetchClient';
+import { getCompontentTree } from './utils/markdown/utils';
+import MarkdownRenderer from './utils/markdown/MarkdownRenderer.vue';
 
 interface IContent {
   content: string;
@@ -125,8 +126,14 @@ interface IContent {
 const content = ref(`[Baidu](https://www.baidu.com)`);
 
 const { tree, tokens, error } = getCompontentTree(content.value);
+
+const tokenTree = ref(tree);
 console.log(tree, tokens, error);
 </script>
-<template></template>
+<template>
+  <div class="">
+    <MarkdownRenderer :tokenTree="tokenTree" />
+  </div>
+</template>
 
 <style scoped></style>
