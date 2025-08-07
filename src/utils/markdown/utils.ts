@@ -1,7 +1,7 @@
-import MarkdownIt from "markdown-it";
-import type { Token as OriginalToken } from "markdown-it";
+import type { Token } from 'markdown-it';
+import MarkdownIt from 'markdown-it';
 
-interface ExtendedToken extends OriginalToken {
+export interface ExtendedToken extends Token {
   CompontentType?: string;
 }
 
@@ -13,8 +13,7 @@ interface CompontentToken {
   CompontentType: string;
 }
 
-type RendererToken = ExtendedToken | CompontentToken;
-
+export type RendererToken = ExtendedToken | CompontentToken;
 
 export interface RendererResult {
   tree: RendererToken[];
@@ -33,7 +32,7 @@ export const getCompontentTree = (initialMarkdown: string): RendererResult => {
       tree: tokensToCompontentTree(tokens),
       tokens: tokens,
       error: null,
-    }
+    };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     return {
@@ -47,7 +46,7 @@ export const getCompontentTree = (initialMarkdown: string): RendererResult => {
 export function tokensToCompontentTree(
   tokens: ExtendedToken[],
   tags: string[] = [],
-  fences: string[] = []
+  fences: string[] = [],
 ): RendererToken[] {
   try {
     const openBlockStask: CompontentToken[] = [];
@@ -56,7 +55,7 @@ export function tokensToCompontentTree(
     // 将节点添加到合适的父节点
     const addNodeToParent = (node: RendererToken) => {
       try {
-        setNodeTemplateType(node, fences); // 设置模板类型
+        setNodeTemplateType(node); // 设置模板类型
 
         // 递归处理子节点
         if ('children' in node && node.children) {
@@ -82,7 +81,7 @@ export function tokensToCompontentTree(
       try {
         if (token.nesting === 1) {
           // 处理开始标签
-          const newBlock = createBlockToken(token, tags);
+          const newBlock = createBlockToken(token);
           openBlockStask.push(newBlock);
         } else if (token.nesting === -1) {
           // 处理结束标签
@@ -111,7 +110,7 @@ function isExtendedToken(node: RendererToken): node is ExtendedToken {
   return 'type' in node; // Token 有 type 属性，CompontentToken 没有
 }
 
-function setNodeTemplateType(node: RendererToken, fences: string[]) {
+function setNodeTemplateType(node: RendererToken) {
   if (node.CompontentType) return; // 已设置则跳过
 
   if (isExtendedToken(node)) {
@@ -120,34 +119,20 @@ function setNodeTemplateType(node: RendererToken, fences: string[]) {
 
     // 代码块特殊处理（如 fence:js、fence:html）
     if (node.type === 'fence') {
-      const codeLanguage = node.info?.split(' ')[0] || '';
-      if (fences.includes(codeLanguage)) {
-        node.CompontentType = `fence:${codeLanguage}`;
-      }
+      node.CompontentType = `fence:${node.info}`;
     }
   }
-
 }
 
-function createBlockToken(token: ExtendedToken, tags: string[]): CompontentToken {
+function createBlockToken(token: ExtendedToken): CompontentToken {
   try {
     const block: CompontentToken = {
-      CompontentType: 'defaultCompontent', // 默认类型
+      CompontentType: 'default', // 默认类型
       tag: token.tag,
       open: token,
       close: undefined, // 初始化为 undefined，闭合时赋值
-      children: []
+      children: [],
     };
-
-    // 容器类型节点（如 container:tip、container:warn）
-    if (token.type.startsWith('container_')) {
-      const containerName = token.info?.split(' ')[0] || '';
-      block.CompontentType = `container:${containerName}`;
-    }
-    // 特殊标签节点（如 tag:div、tag:section）
-    else if (tags.includes(token.tag)) {
-      block.CompontentType = `tag:${token.tag}`;
-    }
 
     return block;
   } catch (error) {
@@ -159,7 +144,7 @@ function createBlockToken(token: ExtendedToken, tags: string[]): CompontentToken
 function closeBlockToken(
   closingToken: ExtendedToken,
   openBlockStask: CompontentToken[],
-  addToParent: (node: RendererToken) => void
+  addToParent: (node: RendererToken) => void,
 ) {
   try {
     const correspondingBlock = openBlockStask.pop();
@@ -178,7 +163,7 @@ function closeBlockToken(
 
 function checkUnclosedBlocks(openBlockStask: CompontentToken[]) {
   if (openBlockStask.length > 0) {
-    const unclosedTags = openBlockStask.map(block => block.tag).join(', ');
+    const unclosedTags = openBlockStask.map((block) => block.tag).join(', ');
     throw new Error(`检测到未闭合的块级节点: ${unclosedTags}`);
   }
 }

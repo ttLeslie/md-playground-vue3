@@ -48,33 +48,6 @@ interface IContent {
 //   model: "Qwen/QwQ-32B",
 // });
 
-// # 一级标题
-// ## 二级标题
-// ### 三级标题
-// #### 四级标题
-// ##### 五级标题
-// ###### 六级标题
-
-// **这是粗体文本**
-// __这也是粗体文本__
-
-// *这是斜体文本*
-// _这也是斜体文本_
-
-// ***这是粗斜体文本***
-
-// ~~这是带删除线的文本~~
-
-// - 无序列表项1
-// - 无序列表项2
-//   - 子列表项2.1
-//   - 子列表项2.2
-
-// 1. 有序列表项1
-// 2. 有序列表项2
-//   1. 子列表项2.1
-//   2. 子列表项2.2
-
 // [Element-Plus-X](https://element-plus-x.com "Element-Plus-X")
 
 // ![示例图片](https://element-plus-x.com/logo.png "一张示例图")
@@ -123,12 +96,47 @@ interface IContent {
 
 // [Baidu](https://www.baidu.com)
 
-const content = ref(`[Baidu](https://www.baidu.com)`);
+// **这是粗体文本**
+// __这也是粗体文本__
+
+// *这是斜体文本*
+// _这也是斜体文本_
+
+// ***这是粗斜体文本***
+
+// ~~这是带删除线的文本~~
+
+// 1. 有序列表项1
+// 2. 有序列表项2
+//   1. 子列表项2.1
+//   2. 子列表项2.2
+
+const content = ref(`
+这是第一行
+这是第二行（直接换行，没有加其他符号）
+
+# 一级标题
+## 二级标题
+### 三级标题
+#### 四级标题
+##### 五级标题
+###### 六级标题
+
+
+
+- 无序列表项1
+- 无序列表项2
+  - 子列表项2.1
+  - 子列表项2.2
+
+
+
+`);
 
 const { tree, tokens, error } = getCompontentTree(content.value);
 
 const tokenTree = ref(tree);
-console.log(tree, tokens, error);
+console.log(tree);
 </script>
 <template>
   <div class="">
